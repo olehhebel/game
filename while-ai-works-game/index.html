@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>While AI works — have some fun</title>
+  <link rel="preload" href="assets/flower_good.png" as="image">
+  <link rel="preload" href="assets/flower_bad.png" as="image">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <div class="phone-mock">
+      <div class="notch"></div>
+      <header class="top">
+        <div class="spinner" aria-hidden="true"></div>
+        <h1>While AI works,<br><span>have some fun</span></h1>
+        <div class="score">
+          <img src="assets/flower_good.png" alt="flower" class="score-flower">
+          <span id="scoreValue">0</span>
+        </div>
+      </header>
+
+      <main class="board" role="grid" aria-label="Tap the flowers">
+        <!-- 9 cells -->
+        <button class="cell" data-index="0" aria-label="cell 1" role="gridcell"></button>
+        <button class="cell" data-index="1" aria-label="cell 2" role="gridcell"></button>
+        <button class="cell" data-index="2" aria-label="cell 3" role="gridcell"></button>
+        <button class="cell" data-index="3" aria-label="cell 4" role="gridcell"></button>
+        <button class="cell" data-index="4" aria-label="cell 5" role="gridcell"></button>
+        <button class="cell" data-index="5" aria-label="cell 6" role="gridcell"></button>
+        <button class="cell" data-index="6" aria-label="cell 7" role="gridcell"></button>
+        <button class="cell" data-index="7" aria-label="cell 8" role="gridcell"></button>
+        <button class="cell" data-index="8" aria-label="cell 9" role="gridcell"></button>
+        <div id="fxLayer" class="fx-layer" aria-hidden="true"></div>
+      </main>
+
+      <footer class="bottom">
+        <button id="startBtn" class="primary">Start</button>
+        <button id="stopBtn" class="secondary" disabled>Stop</button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
