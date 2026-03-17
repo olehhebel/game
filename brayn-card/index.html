@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRAYN Volumetric Card</title>
+    <style>
+        :root {
+            --orange-glow: rgba(255, 85, 0, 0.4);
+            --card-bg: #0a0a0a;
+            --card-border: rgba(255, 255, 255, 0.15);
+            --glass-highlight: rgba(255, 255, 255, 0.1);
+            --bg-deep: #020202;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, #111 0%, var(--bg-deep) 70%, #000 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            perspective: 1400px;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.85) 100%);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .scene {
+            position: relative;
+            width: 320px;
+            height: 480px;
+            transform-style: preserve-3d;
+        }
+
+        .card-shadow {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            width: 260px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            box-shadow: 0 0 40px 20px rgba(0,0,0,0.8);
+            transform: translateX(-50%) rotateX(90deg) translateZ(-100px);
+            border-radius: 50%;
+            filter: blur(15px);
+            will-change: transform, opacity;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            border-radius: 30px;
+            will-change: transform;
+        }
+
+        /* 3D Volume Layers (Simulating physical 2-3mm thickness) */
+        .volume {
+            position: absolute;
+            inset: 0;
+            border-radius: 30px;
+            background: var(--card-bg);
+            box-shadow: inset 0 0 0 1px var(--card-border);
+            transform-style: preserve-3d;
+        }
+        .v-1 { transform: translateZ(-1px); }
+        .v-2 { transform: translateZ(-2px); }
+        .v-3 { transform: translateZ(-3px); }
+        .v-4 { transform: translateZ(-4px); }
+        .v-5 { 
+            transform: translateZ(-5px); 
+            background: #000;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), 0 0 0px var(--orange-glow);
+            will-change: box-shadow;
+        }
+
+        /* Image Layers for Internal Parallax */
+        .layer {
+            position: absolute;
+            inset: 0;
+            border-radius: 30px;
+            transform-style: preserve-3d;
+            pointer-events: none;
+        }
+
+        .layer-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 30px;
+            pointer-events: none;
+            mix-blend-mode: screen; 
+        }
+
+        /* Усиленные глубины (Stronger Parallax) */
+        .layer-back { transform: translateZ(12px); }
+        .layer-mid { transform: translateZ(28px); }
+        .layer-front { transform: translateZ(44px); }
+        
+        /* Оборотная сторона (Reverse Face) */
+        .layer-reverse { 
+            transform: translateZ(-6px) rotateY(180deg); 
+            background: var(--card-bg);
+            box-shadow: inset 0 0 0 1px var(--card-border);
+        }
+
+        /* Glass Cover (Glare & Reflection Engine) */
+        .glass-cover {
+            position: absolute;
+            inset: 0;
+            transform: translateZ(50px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: linear-gradient(
+                125deg, 
+                transparent 0%, 
+                transparent 40%, 
+                var(--glass-highlight) 45%, 
+                rgba(255,255,255,0.3) 50%, 
+                var(--glass-highlight) 55%, 
+                transparent 60%, 
+                transparent 100%
+            );
+            background-size: 300% 300%;
+            background-position: 100% 100%;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            backdrop-filter: brightness(1.05) contrast(1.1);
+            -webkit-backdrop-filter: brightness(1.05) contrast(1.1);
+            will-change: background-position;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scene">
+        <div class="card" id="braynCard">
+            <!-- Physical Edge Volume -->
+            <div class="volume v-5" id="cardGlow"></div>
+            <div class="volume v-4"></div>
+            <div class="volume v-3"></div>
+            <div class="volume v-2"></div>
+            <div class="volume v-1"></div>
+            <div class="volume v-0"></div>
+
+            <!-- Reverse Face (Оборотная сторона) -->
+            <!-- Пути используют "./", что означает "в той же папке, что и этот HTML" -->
+            <div class="layer layer-reverse">
+                <img src="./Design Thinking.png" alt="Orbital Graphics Back" class="layer-img">
+            </div>
+
+            <!-- Internal Parallax Layers (Front facing) -->
+            <div class="layer layer-back">
+                <img src="./Design Thinking.png" alt="Orbital Graphics" class="layer-img">
+            </div>
+            
+            <div class="layer layer-mid">
+                <img src="./Design Thinking-1.png" alt="Orange Fuzzy Volume" class="layer-img">
+            </div>
+
+            <div class="layer layer-front">
+                <img src="./Design Thinking-2.png" alt="BRAYN Typography" class="layer-img">
+            </div>
+
+            <!-- Front Glass/Glare -->
+            <div class="glass-cover" id="glassCover"></div>
+        </div>
+        <div class="card-shadow" id="cardShadow"></div>
+    </div>
+
+    <script>
+        const card = document.getElementById('braynCard');
+        const shadow = document.getElementById('cardShadow');
+        const glass = document.getElementById('glassCover');
+        const glow = document.getElementById('cardGlow');
+        
+        let isAnimating = false;
+        let startTime = null;
+        const durationMs = 2000;
+
+        // Premium cinematic easing (Ease In Out Quart)
+        function easeInOutQuart(x) {
+            return x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2;
+        }
+
+        function animateSpin(currentTime) {
+            if (!startTime) startTime = currentTime;
+            const elapsed = currentTime - startTime;
+            let progress = Math.min(elapsed / durationMs, 1);
+            
+            const ease = easeInOutQuart(progress);
+            
+            // Core Rotation
+            const rotY = ease * 360;
+            
+            // Secondary Motion (peaks at exactly mid-spin)
+            const peak = Math.sin(progress * Math.PI); // 0 -> 1 -> 0
+            const rotX = peak * 3;     // 3deg max tilt
+            const rotZ = peak * 1.0;   // 1deg max wobble
+            const scale = 1 + (peak * 0.012); // 1.012 max scale
+            
+            // Apply Transforms
+            card.style.transform = `rotateY(${rotY}deg) rotateX(${rotX}deg) rotateZ(${rotZ}deg) scale(${scale})`;
+            
+            // Shadow Reactivity
+            shadow.style.transform = `translateX(-50%) rotateX(90deg) translateZ(-100px) scale(${1 - peak * 0.15})`;
+            shadow.style.opacity = 1 - (peak * 0.4);
+            
+            // Glare Sweep (100% to -50%)
+            const glarePos = 100 - (ease * 150);
+            glass.style.backgroundPosition = `${glarePos}% ${glarePos}%`;
+            
+            // Dynamic Orange Glow on Back Volume
+            glow.style.boxShadow = `inset 0 0 0 1px rgba(255,255,255,0.05), 0 0 ${peak * 60}px ${peak * 15}px var(--orange-glow)`;
+
+            if (progress < 1) {
+                requestAnimationFrame(animateSpin);
+            } else {
+                // Ensure perfect resting state
+                isAnimating = false;
+                card.style.transform = `rotateY(0deg) rotateX(0deg) rotateZ(0deg) scale(1)`;
+                glass.style.backgroundPosition = `100% 100%`;
+            }
+        }
+
+        card.addEventListener('click', () => {
+            if (isAnimating) return;
+            isAnimating = true;
+            startTime = null;
+            requestAnimationFrame(animateSpin);
+        });
+    </script>
+</body>
+</html>
